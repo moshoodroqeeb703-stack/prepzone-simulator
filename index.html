@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#0D0D0D"/>
+<link rel="manifest" href="manifest.json"/>
+<title>PrepZone Simulator — WAEC, NECO & JAMB Past Questions</title>
+<style>
+:root{
+  --black:#0D0D0D;--black2:#111;--black3:#161616;--black4:#1E1E1E;--black5:#2A2A2A;
+  --gold:#C9A227;--gold-light:#E8C96A;--gold-dim:rgba(201,162,39,0.12);--gold-border:rgba(201,162,39,0.25);
+  --green:#0A3D2E;--green-mid:#1A8C68;--green-light:#E3F5EE;
+  --red:#C0392B;--red-bg:#FDEDEC;
+  --white:#FFFFFF;--off-white:#F5F2EB;
+  --text:#FFFFFF;--text2:#AAAAAA;--text3:#555555;
+  --radius:14px;--radius-sm:9px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--black);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent;}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;padding-bottom:40px;}
+.screen.active{display:block;}
+
+/* TOPBAR */
+.topbar{background:var(--black2);border-bottom:0.5px solid var(--black5);padding:13px 18px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
+.tb-logo{display:flex;align-items:center;gap:10px;}
+.tb-icon{width:30px;height:30px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;flex-shrink:0;}
+.tb-bar{background:var(--black);border-radius:1px;height:2px;}
+.tb-wordmark{font-size:15px;font-weight:700;letter-spacing:-.3px;}
+.tb-wordmark span{color:var(--gold);}
+.tb-sub{font-size:10px;color:var(--text3);font-weight:600;letter-spacing:1.5px;text-transform:uppercase;}
+.tb-back{font-size:22px;cursor:pointer;line-height:1;flex-shrink:0;color:var(--text2);}
+.tb-title{font-size:14px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tb-right{font-size:11px;background:var(--black4);border:0.5px solid var(--black5);padding:5px 11px;border-radius:20px;color:var(--text2);white-space:nowrap;}
+
+/* LANDING */
+#screen-landing{background:var(--black);padding-bottom:0;}
+.hero{padding:36px 22px 24px;text-align:center;}
+.hero-flag{display:inline-flex;align-items:center;gap:7px;background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.8px;margin-bottom:20px;}
+.hero h1{font-size:28px;font-weight:800;line-height:1.2;margin-bottom:10px;letter-spacing:-.5px;}
+.hero h1 span{color:var(--gold);}
+.hero-tagline{font-size:13px;color:var(--text2);margin-bottom:24px;letter-spacing:.3px;}
+.hero-tagline strong{color:var(--gold);font-weight:600;}
+.exam-badges{display:flex;gap:8px;justify-content:center;margin-bottom:32px;}
+.exam-badge{padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid var(--black5);color:var(--text2);}
+.exam-badge.w{border-color:var(--green-mid);color:var(--green-mid);}
+.exam-badge.n{border-color:var(--gold);color:var(--gold);}
+.exam-badge.j{border-color:#5B8DEF;color:#7EB3FF;}
+.white-sheet{background:var(--black2);border-radius:20px 20px 0 0;border-top:0.5px solid var(--black5);padding:26px 20px 0;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:0.5px solid var(--black5);margin-bottom:20px;}
+.tab{flex:1;padding:11px 6px;font-size:13px;font-weight:600;color:var(--text3);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px;transition:all .2s;}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* FORMS */
+.fgroup{margin-bottom:15px;}
+label{display:block;font-size:11px;font-weight:700;color:var(--text3);margin-bottom:7px;letter-spacing:.8px;text-transform:uppercase;}
+input,select{width:100%;border:1px solid var(--black5);border-radius:var(--radius-sm);padding:13px 15px;font-size:15px;color:var(--text);background:var(--black3);outline:none;transition:border .2s;}
+input:focus,select:focus{border-color:var(--gold);}
+input::placeholder{color:var(--text3);}
+select option{background:var(--black3);}
+
+/* BUTTONS */
+.btn{width:100%;padding:14px;border-radius:var(--radius-sm);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all .15s;letter-spacing:-.2px;}
+.btn:active{transform:scale(.98);}
+.btn-gold{background:var(--gold);color:var(--black);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-outline{background:transparent;border:1px solid var(--black5);color:var(--text2);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-sm{width:auto;padding:7px 14px;font-size:12px;font-weight:700;border-radius:7px;}
+.mt12{margin-top:12px;}
+
+/* ALERTS */
+.alert{padding:12px 15px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:14px;line-height:1.5;}
+.alert-red{background:rgba(192,57,43,0.15);color:#FF6B6B;border:1px solid rgba(192,57,43,0.3);}
+.alert-gold{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border);}
+.alert-green{background:rgba(26,140,104,0.15);color:#4ECBA0;border:1px solid rgba(26,140,104,0.3);}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0;}
+.divider hr{flex:1;border:none;border-top:0.5px solid var(--black5);}
+.divider span{font-size:11px;color:var(--text3);letter-spacing:.5px;}
+
+/* SECTION */
+.section{padding:18px 18px 0;}
+.sec-head{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+
+/* EXAM CARDS */
+.exam-cards{display:flex;flex-direction:column;gap:12px;padding:18px;}
+.exam-card{background:var(--black3);border-radius:var(--radius);padding:18px;border:0.5px solid var(--black5);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;}
+.exam-card:active{transform:scale(.99);}
+.exam-card:hover{border-color:var(--gold);background:var(--black4);}
+.e-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.e-green{background:rgba(10,61,46,0.8);border:0.5px solid rgba(26,140,104,0.3);}
+.e-gold{background:var(--gold-dim);border:0.5px solid var(--gold-border);}
+.e-blue{background:rgba(27,77,161,0.2);border:0.5px solid rgba(91,141,239,0.3);}
+.e-info h3{font-size:16px;font-weight:700;margin-bottom:3px;}
+.e-info p{font-size:12px;color:var(--text2);line-height:1.5;}
+.e-arrow{margin-left:auto;color:var(--text3);font-size:18px;flex-shrink:0;}
+
+/* CATEGORY GRID */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:18px;}
+.cat-card{background:var(--black3);border-radius:var(--radius);padding:18px 14px;border:0.5px solid var(--black5);cursor:pointer;text-align:center;transition:all .2s;}
+.cat-card:active{transform:scale(.97);}
+.cat-card:hover{border-color:var(--gold);}
+.cat-card .c-icon{font-size:30px;margin-bottom:9px;}
+.cat-card .c-name{font-size:14px;font-weight:700;margin-bottom:3px;}
+.cat-card .c-desc{font-size:11px;color:var(--text3);line-height:1.4;}
+
+/* SUBJECT LIST */
+.subject-list{display:flex;flex-direction:column;gap:8px;padding:18px;}
+.subj-item{background:var(--black3);border-radius:var(--radius-sm);padding:14px 16px;border:0.5px solid var(--black5);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .2s;}
+.subj-item:active{transform:scale(.99);}
+.subj-item:hover{border-color:var(--gold);}
+.subj-left{display:flex;align-items:center;gap:12px;}
+.subj-emoji{font-size:22px;}
+.subj-name{font-size:14px;font-weight:600;}
+.subj-arrow{color:var(--text3);font-size:16px;}
+
+/* YEAR GRID */
+.year-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:18px;}
+.yr-btn{background:var(--black3);border:0.5px solid var(--black5);border-radius:var(--radius-sm);padding:14px 6px;font-size:14px;font-weight:700;text-align:center;cursor:pointer;transition:all .2s;color:var(--text);}
+.yr-btn:active{transform:scale(.95);}
+.yr-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* QUIZ */
+#screen-quiz{background:var(--black);}
+.q-prog{background:var(--black2);padding:12px 18px;border-bottom:0.5px solid var(--black5);}
+.prog-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:7px;}
+.prog-bar{height:4px;background:var(--black5);border-radius:10px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--gold);border-radius:10px;transition:width .4s ease;}
+.q-card{margin:15px;background:var(--black3);border-radius:var(--radius);padding:20px;border:0.5px solid var(--black5);}
+.q-num{font-size:10px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.q-text{font-size:15px;font-weight:500;line-height:1.7;color:var(--text);margin-bottom:20px;}
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{display:flex;align-items:center;gap:12px;padding:13px 15px;border:0.5px solid var(--black5);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;background:var(--black4);}
+.opt:active{transform:scale(.99);}
+.opt-badge{width:28px;height:28px;border-radius:50%;border:1px solid var(--black5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;transition:all .2s;color:var(--text2);}
+.opt-text{font-size:14px;line-height:1.4;color:var(--text);}
+.opt.selected{border-color:var(--gold);background:var(--gold-dim);}
+.opt.selected .opt-badge{background:var(--gold);color:var(--black);border-color:var(--gold);}
+.opt.correct{border-color:var(--green-mid);background:rgba(26,140,104,0.1);}
+.opt.correct .opt-badge{background:var(--green-mid);color:#fff;border-color:var(--green-mid);}
+.opt.wrong{border-color:var(--red);background:rgba(192,57,43,0.1);}
+.opt.wrong .opt-badge{background:var(--red);color:#fff;border-color:var(--red);}
+.opt.disabled{pointer-events:none;}
+.explanation{display:none;margin:0 15px 4px;padding:13px 16px;background:rgba(26,140,104,0.1);border-left:2px solid var(--green-mid);border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:13px;color:#4ECBA0;line-height:1.6;}
+.explanation.show{display:block;}
+.q-footer{padding:14px 18px 30px;}
+.loading-q{padding:50px 20px;text-align:center;color:var(--text3);}
+.spin{width:36px;height:36px;border:2px solid var(--black5);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* RESULT */
+#screen-result{background:var(--black);}
+.result-top{background:var(--black2);padding:36px 22px 30px;text-align:center;border-bottom:0.5px solid var(--black5);}
+.result-ring{width:120px;height:120px;border-radius:50%;border:2px solid var(--black5);background:var(--black3);display:inline-flex;align-items:center;justify-content:center;flex-direction:column;margin-bottom:18px;position:relative;}
+.result-ring::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--gold-border);}
+.r-pct{font-size:34px;font-weight:800;color:var(--gold);line-height:1;}
+.r-pct-sub{font-size:10px;color:var(--text3);margin-top:2px;letter-spacing:.5px;}
+.r-grade{font-size:20px;font-weight:800;margin-bottom:6px;}
+.r-sub{font-size:13px;color:var(--text2);}
+.result-body{padding:20px 18px;}
+.r-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.r-stat{background:var(--black3);border-radius:var(--radius-sm);padding:14px 8px;text-align:center;border:0.5px solid var(--black5);}
+.r-num{font-size:22px;font-weight:800;}
+.r-lbl{font-size:11px;color:var(--text3);margin-top:3px;}
+.gold-num{color:var(--gold);}
+.red-num{color:#FF6B6B;}
+
+/* ADMIN LOGIN */
+#screen-admin-login{background:var(--black);}
+.center-wrap{max-width:420px;margin:0 auto;padding:30px 20px;}
+.logo-block{text-align:center;padding:20px 0 24px;}
+.logo-circle{width:68px;height:68px;background:var(--gold);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;margin-bottom:14px;}
+.logo-circle-bar{background:var(--black);border-radius:1.5px;height:3px;}
+.logo-block h2{font-size:20px;font-weight:800;}
+.logo-block p{font-size:13px;color:var(--text2);margin-top:5px;}
+.small-link{font-size:13px;color:var(--text3);text-align:center;cursor:pointer;display:block;margin-top:16px;text-decoration:none;}
+.small-link:hover{color:var(--gold);}
+
+/* ADMIN DASHBOARD */
+#screen-admin{background:var(--black);}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.stat-box{background:var(--black3);border-radius:var(--radius-sm);padding:14px 10px;border:0.5px solid var(--black5);text-align:center;}
+.stat-n{font-size:24px;font-weight:800;color:var(--gold);}
+.stat-l{font-size:11px;color:var(--text3);margin-top:3px;}
+.gen-box{background:var(--black3);border-radius:var(--radius);padding:18px;border:0.5px solid var(--black5);margin-bottom:16px;}
+.gen-box h3{font-size:15px;font-weight:700;margin-bottom:4px;}
+.gen-box p{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5;}
+.code-item{background:var(--black3);border-radius:var(--radius-sm);padding:13px 15px;border:0.5px solid var(--black5);display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.code-val{font-family:monospace;font-size:16px;font-weight:800;color:var(--gold);letter-spacing:2px;}
+.code-meta{font-size:11px;color:var(--text3);margin-top:3px;}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.badge-active{background:rgba(26,140,104,0.15);color:#4ECBA0;border:1px solid rgba(26,140,104,0.2);}
+.badge-used{background:rgba(192,57,43,0.15);color:#FF6B6B;border:1px solid rgba(192,57,43,0.2);}
+.score-item{background:var(--black3);border-radius:var(--radius-sm);padding:12px 15px;border:0.5px solid var(--black5);display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.sname{font-size:14px;font-weight:600;}
+.smeta{font-size:11px;color:var(--text3);margin-top:2px;}
+.score-pct{font-size:13px;font-weight:800;padding:5px 12px;border-radius:20px;}
+.pct-hi{background:rgba(26,140,104,0.15);color:#4ECBA0;}
+.pct-mid{background:var(--gold-dim);color:var(--gold);}
+.pct-lo{background:rgba(192,57,43,0.15);color:#FF6B6B;}
+.empty{text-align:center;padding:36px 20px;color:var(--text3);}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<!-- ══ LANDING ══ -->
+<div id="screen-landing" class="screen active">
+  <div class="hero">
+    <div class="hero-flag">🇳🇬 &nbsp;NIGERIA'S EXAM SIMULATOR</div>
+    <h1>Ace <span>WAEC, NECO</span><br/>& JAMB</h1>
+    <div class="hero-tagline"><strong>Simulate. Practice. Pass.</strong></div>
+    <div class="exam-badges">
+      <span class="exam-badge w">✅ WAEC</span>
+      <span class="exam-badge n">📝 NECO</span>
+      <span class="exam-badge j">🎓 JAMB</span>
+    </div>
+  </div>
+  <div class="white-sheet">
+    <div class="tabs">
+      <button class="tab active" onclick="switchLandingTab('student',this)">Student</button>
+      <button class="tab" onclick="switchLandingTab('teacher',this)">Teacher / School</button>
+    </div>
+    <div id="ltab-student">
+      <div id="land-err" class="alert alert-red" style="display:none"></div>
+      <div class="fgroup">
+        <label>Your Full Name</label>
+        <input id="stu-name" type="text" placeholder="e.g. Chukwuemeka Okafor" autocomplete="off"/>
+      </div>
+      <div class="fgroup">
+        <label>Access Code</label>
+        <input id="stu-code" type="text" placeholder="e.g. PZ-A3X9B" maxlength="10"
+          style="text-transform:uppercase;letter-spacing:3px;font-family:monospace;font-weight:800;font-size:17px"
+          oninput="this.value=this.value.toUpperCase()"/>
+      </div>
+      <button class="btn btn-gold" onclick="validateCode()">Start Practising →</button>
+      <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.7">
+        Demo code: <strong style="color:var(--gold);font-family:monospace;letter-spacing:2px">PZ-DEMO1</strong><br/>
+        Get a real code from your teacher
+      </p>
+    </div>
+    <div id="ltab-teacher" style="display:none">
+      <div class="alert alert-gold">
+        💡 Buy access codes for your students. Each ₦500 code unlocks all exams and subjects.
+      </div>
+      <button class="btn btn-gold" onclick="goTo('admin-login')">Go to Teacher Portal →</button>
+      <div class="divider"><hr/><span>HOW IT WORKS</span><hr/></div>
+      <div style="font-size:13px;color:var(--text2);line-height:2.2">
+        1️⃣ &nbsp;Create a free teacher account<br/>
+        2️⃣ &nbsp;Pay ₦500 per student via Paystack<br/>
+        3️⃣ &nbsp;Codes generated instantly<br/>
+        4️⃣ &nbsp;Give each student their unique code<br/>
+        5️⃣ &nbsp;Track every student's score live
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EXAM SELECT ══ -->
+<div id="screen-exam" class="screen">
+  <div class="topbar">
+    <span class="tb-back" onclick="goTo('landing')">←</span>
+    <span class="tb-title">Choose Your Exam</span>
+    <span class="tb-right" id="exam-stu-name"></span>
+  </div>
+  <div style="padding:16px 18px 6px;font-size:13px;color:var(--text2)">Select the exam you are preparing for.</div>
+  <div class="exam-cards">
+    <div class="exam-card" onclick="selectExam('wassce','WAEC SSCE')">
+      <div class="e-icon e-green">📗</div>
+      <div class="e-info">
+        <h3>WAEC (SSCE)</h3>
+        <p>Science · Commercial · Arts<br/>Real past questions 2001–2020</p>
+      </div>
+      <span class="e-arrow">›</span>
+    </div>
+    <div class="exam-card" onclick="selectExam('neco','NECO SSCE')">
+      <div class="e-icon e-gold">📙</div>
+      <div class="e-info">
+        <h3>NECO (SSCE)</h3>
+        <p>Science · Commercial · Arts<br/>Real past questions 2001–2020</p>
+      </div>
+      <span class="e-arrow">›</span>
+    </div>
+    <div class="exam-card" onclick="selectExam('utme','JAMB UTME')">
+      <div class="e-icon e-blue">🎓</div>
+      <div class="e-info">
+        <h3>JAMB (UTME)</h3>
+        <p>All subjects · University entrance<br/>Real past questions 2001–2020</p>
+      </div>
+      <span class="e-arrow">›</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CATEGORY SELECT ══ -->
+<div id="screen-category" class="screen">
+  <div class="topbar">
+    <span class="tb-back" onclick="goTo('exam')">←</span>
+    <span class="tb-title" id="cat-title">Select Category</span>
+  </div>
+  <div style="padding:16px 18px 6px;font-size:13px;color:var(--text2)">Choose your subject category</div>
+  <div class="cat-grid" id="cat-grid"></div>
+</div>
+
+<!-- ══ SUBJECT SELECT ══ -->
+<div id="screen-subject" class="screen">
+  <div class="topbar">
+    <span class="tb-back" onclick="goTo('category')">←</span>
+    <span class="tb-title" id="subj-title">Select Subject</span>
+  </div>
+  <div style="padding:16px 18px 6px;font-size:13px;color:var(--text2)">Choose a subject to practise</div>
+  <div class="subject-list" id="subject-list"></div>
+</div>
+
+<!-- ══ YEAR SELECT ══ -->
+<div id="screen-year" class="screen">
+  <div class="topbar">
+    <span class="tb-back" onclick="goTo('subject')">←</span>
+    <span class="tb-title" id="year-title">Select Year</span>
+  </div>
+  <div style="padding:16px 18px 6px;font-size:13px;color:var(--text2)">Pick a year — real questions load from the database</div>
+  <div class="year-grid" id="year-grid"></div>
+</div>
+
+<!-- ══ QUIZ ══ -->
+<div id="screen-quiz" class="screen">
+  <div class="topbar">
+    <span class="tb-back" onclick="confirmQuit()">←</span>
+    <span class="tb-title" id="quiz-label"></span>
+    <span class="tb-right" id="quiz-timer">⏱ 00:00</span>
+  </div>
+  <div class="q-prog">
+    <div class="prog-row">
+      <span id="q-counter">Q 1 of 20</span>
+      <span id="q-score" style="color:var(--gold)">Score: 0</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div id="quiz-body">
+    <div class="loading-q"><div class="spin"></div><div style="font-size:14px">Loading questions…</div></div>
+  </div>
+  <div class="explanation" id="explanation"></div>
+  <div class="q-footer">
+    <button class="btn btn-gold" id="next-btn" onclick="nextQ()" style="display:none">Next Question →</button>
+  </div>
+</div>
+
+<!-- ══ RESULT ══ -->
+<div id="screen-result" class="screen">
+  <div class="result-top">
+    <div class="result-ring">
+      <div class="r-pct" id="r-pct">0%</div>
+      <div class="r-pct-sub">YOUR SCORE</div>
+    </div>
+    <div class="r-grade" id="r-grade"></div>
+    <div class="r-sub" id="r-msg"></div>
+  </div>
+  <div class="result-body">
+    <div class="r-grid">
+      <div class="r-stat"><div class="r-num gold-num" id="r-correct">0</div><div class="r-lbl">Correct</div></div>
+      <div class="r-stat"><div class="r-num red-num" id="r-wrong">0</div><div class="r-lbl">Wrong</div></div>
+      <div class="r-stat"><div class="r-num" id="r-total">0</div><div class="r-lbl">Questions</div></div>
+    </div>
+    <div class="alert alert-green" id="r-summary" style="text-align:center;font-size:14px;font-weight:600"></div>
+    <button class="btn btn-gold mt12" onclick="goTo('year')">Try Another Year →</button>
+    <button class="btn btn-outline mt12" onclick="goTo('subject')">Change Subject</button>
+    <button class="btn btn-outline mt12" onclick="shareWhatsApp()">📲 Share Score on WhatsApp</button>
+  </div>
+</div>
+
+<!-- ══ ADMIN LOGIN ══ -->
+<div id="screen-admin-login" class="screen">
+  <div class="center-wrap">
+    <div class="logo-block">
+      <div class="logo-circle">
+        <div class="logo-circle-bar" style="width:28px"></div>
+        <div class="logo-circle-bar" style="width:20px"></div>
+        <div class="logo-circle-bar" style="width:24px"></div>
+      </div>
+      <h2>Teacher Portal</h2>
+      <p>Manage codes & track student scores</p>
+    </div>
+    <div id="admin-err" class="alert alert-red" style="display:none"></div>
+    <div class="tabs" style="margin-bottom:20px">
+      <button class="tab active" onclick="switchAuthTab('login',this)">Sign In</button>
+      <button class="tab" onclick="switchAuthTab('register',this)">Create Account</button>
+    </div>
+    <div id="atab-login">
+      <div class="fgroup"><label>Email</label><input id="a-email" type="email" placeholder="you@email.com"/></div>
+      <div class="fgroup"><label>Password</label><input id="a-pass" type="password" placeholder="••••••••"/></div>
+      <button class="btn btn-gold" onclick="adminLogin()">Sign In →</button>
+    </div>
+    <div id="atab-register" style="display:none">
+      <div class="fgroup"><label>Your Name / School</label><input id="r-name" type="text" placeholder="e.g. Mr. Adeyemi — Lagos Model School"/></div>
+      <div class="fgroup"><label>Email</label><input id="r-email" type="email" placeholder="you@email.com"/></div>
+      <div class="fgroup"><label>Password (min 6 characters)</label><input id="r-pass" type="password" placeholder="••••••••"/></div>
+      <button class="btn btn-gold" onclick="adminRegister()">Create Account →</button>
+    </div>
+    <a class="small-link" onclick="goTo('landing')">← Back to student portal</a>
+  </div>
+</div>
+
+<!-- ══ ADMIN DASHBOARD ══ -->
+<div id="screen-admin" class="screen">
+  <div class="topbar">
+    <div class="tb-logo">
+      <div class="tb-icon">
+        <div class="tb-bar" style="width:16px"></div>
+        <div class="tb-bar" style="width:11px"></div>
+        <div class="tb-bar" style="width:13px"></div>
+      </div>
+      <div>
+        <div class="tb-wordmark">Prep<span>Zone</span></div>
+        <div class="tb-sub">Teacher Portal</div>
+      </div>
+    </div>
+    <span style="flex:1"></span>
+    <span id="admin-name" style="font-size:12px;color:var(--text3);margin-right:8px"></span>
+    <button class="btn btn-sm btn-outline" onclick="adminLogout()">Logout</button>
+  </div>
+  <div class="section" style="padding-top:18px">
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-n" id="st-codes">0</div><div class="stat-l">Total Codes</div></div>
+      <div class="stat-box"><div class="stat-n" id="st-used">0</div><div class="stat-l">Used</div></div>
+      <div class="stat-box"><div class="stat-n" id="st-students">0</div><div class="stat-l">Students</div></div>
+    </div>
+
+    <div class="gen-box">
+      <h3>💳 Buy Access Codes</h3>
+      <p>Each code = ₦500. One code per student. Unlocks all exams and all subjects.</p>
+      <div class="fgroup" style="margin-bottom:12px">
+        <label>Number of Codes</label>
+        <select id="code-qty">
+          <option value="1">1 code — ₦500</option>
+          <option value="5">5 codes — ₦2,500</option>
+          <option value="10">10 codes — ₦5,000</option>
+          <option value="20">20 codes — ₦10,000</option>
+          <option value="50">50 codes — ₦25,000</option>
+        </select>
+      </div>
+      <button class="btn btn-gold" onclick="payAndGenerate()">Pay with Paystack →</button>
+      <div style="margin-top:9px;font-size:11px;color:var(--text3);text-align:center">Codes are created instantly after payment is confirmed</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" id="dt-codes" onclick="switchDashTab('codes',this)">My Codes</button>
+      <button class="tab" id="dt-scores" onclick="switchDashTab('scores',this)">Student Scores</button>
+    </div>
+    <div id="dpanel-codes">
+      <div class="sec-head" style="margin-top:6px">Generated Codes</div>
+      <div id="codes-list"></div>
+    </div>
+    <div id="dpanel-scores" style="display:none">
+      <div class="sec-head" style="margin-top:6px">Student Results</div>
+      <div id="scores-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════ CONFIG ═══════════════════════
+const ALOC_TOKEN  = 'ALOC-4dc4c56e978c63e7f2c0';
+const ALOC_BASE   = 'https://questions.aloc.com.ng/api/v2/q';
+const PAYSTACK_PK = 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'; // ← Replace with your real Paystack public key
+
+// ═══════════════════════ SUBJECTS DATA ═══════════════════════
+const CATS = {
+  wassce:[
+    {id:'science',name:'Science',icon:'🔬',desc:'Maths · Physics · Chemistry · Biology',subjects:[
+      {id:'mathematics',name:'Mathematics',e:'📐'},{id:'physics',name:'Physics',e:'🔭'},
+      {id:'chemistry',name:'Chemistry',e:'⚗️'},{id:'biology',name:'Biology',e:'🌿'},
+      {id:'geography',name:'Geography',e:'🌍'},{id:'civiledu',name:'Civic Education',e:'🏛️'},
+    ]},
+    {id:'commercial',name:'Commercial',icon:'💼',desc:'Economics · Commerce · Accounting · Government',subjects:[
+      {id:'economics',name:'Economics',e:'📈'},{id:'commerce',name:'Commerce',e:'🛒'},
+      {id:'accounting',name:'Accounting',e:'🧾'},{id:'government',name:'Government',e:'🏛️'},
+      {id:'insurance',name:'Insurance',e:'📋'},
+    ]},
+    {id:'arts',name:'Arts',icon:'🎨',desc:'Literature · History · CRK · IRK · English',subjects:[
+      {id:'englishlit',name:'Literature in English',e:'📚'},{id:'history',name:'History',e:'🏺'},
+      {id:'crk',name:'Christian Religious Studies',e:'✝️'},{id:'irk',name:'Islamic Religious Studies',e:'☪️'},
+      {id:'english',name:'English Language',e:'📖'},
+    ]},
+  ],
+  neco:[
+    {id:'science',name:'Science',icon:'🔬',desc:'Maths · Physics · Chemistry · Biology',subjects:[
+      {id:'mathematics',name:'Mathematics',e:'📐'},{id:'physics',name:'Physics',e:'🔭'},
+      {id:'chemistry',name:'Chemistry',e:'⚗️'},{id:'biology',name:'Biology',e:'🌿'},
+      {id:'geography',name:'Geography',e:'🌍'},
+    ]},
+    {id:'commercial',name:'Commercial',icon:'💼',desc:'Economics · Commerce · Accounting · Government',subjects:[
+      {id:'economics',name:'Economics',e:'📈'},{id:'commerce',name:'Commerce',e:'🛒'},
+      {id:'accounting',name:'Accounting',e:'🧾'},{id:'government',name:'Government',e:'🏛️'},
+    ]},
+    {id:'arts',name:'Arts',icon:'🎨',desc:'Literature · History · CRK · English',subjects:[
+      {id:'englishlit',name:'Literature in English',e:'📚'},{id:'history',name:'History',e:'🏺'},
+      {id:'crk',name:'Christian Religious Studies',e:'✝️'},{id:'english',name:'English Language',e:'📖'},
+    ]},
+  ],
+  utme:[
+    {id:'all',name:'All Subjects',icon:'📚',desc:'Every JAMB subject',subjects:[
+      {id:'english',name:'English Language',e:'📖'},{id:'mathematics',name:'Mathematics',e:'📐'},
+      {id:'physics',name:'Physics',e:'🔭'},{id:'chemistry',name:'Chemistry',e:'⚗️'},
+      {id:'biology',name:'Biology',e:'🌿'},{id:'economics',name:'Economics',e:'📈'},
+      {id:'government',name:'Government',e:'🏛️'},{id:'geography',name:'Geography',e:'🌍'},
+      {id:'commerce',name:'Commerce',e:'🛒'},{id:'accounting',name:'Accounting',e:'🧾'},
+      {id:'englishlit',name:'Literature in English',e:'📚'},{id:'history',name:'History',e:'🏺'},
+      {id:'crk',name:'Christian Religious Studies',e:'✝️'},{id:'irk',name:'Islamic Religious Studies',e:'☪️'},
+      {id:'civiledu',name:'Civic Education',e:'🏛️'},{id:'insurance',name:'Insurance',e:'📋'},
+      {id:'currentaffairs',name:'Current Affairs',e:'📰'},
+    ]},
+  ]
+};
+const YEARS=[];for(let y=2020;y>=2001;y--)YEARS.push(y);
+
+// ═══════════════════════ STATE ═══════════════════════
+const S={student:null,exam:null,examLabel:'',category:null,subject:null,year:null,
+  questions:[],qi:0,score:0,answered:false,timerID:null,secs:0,adminUser:null};
+
+// ═══════════════════════ DB ═══════════════════════
+function db(){try{return JSON.parse(localStorage.getItem('pzDB')||'{}')}catch{return{}}}
+function saveDB(d){localStorage.setItem('pzDB',JSON.stringify(d))}
+function initDB(){
+  const d=db();
+  if(!d.teachers)d.teachers={};
+  if(!d.codes)d.codes={};
+  if(!d.scores)d.scores=[];
+  if(!d.teachers['demo@prepzone.ng'])d.teachers['demo@prepzone.ng']={name:'Demo Teacher',password:'demo123',codes:[]};
+  if(!d.codes['PZ-DEMO1']){d.codes['PZ-DEMO1']={owner:'demo@prepzone.ng',used:false,usedBy:null};d.teachers['demo@prepzone.ng'].codes.push('PZ-DEMO1');}
+  saveDB(d);return d;
+}
+
+// ═══════════════════════ NAV ═══════════════════════
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════ TABS ═══════════════════════
+function switchLandingTab(tab,el){
+  document.querySelectorAll('#screen-landing .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ltab-student').style.display=tab==='student'?'block':'none';
+  document.getElementById('ltab-teacher').style.display=tab==='teacher'?'block':'none';
+}
+function switchAuthTab(tab,el){
+  document.querySelectorAll('#screen-admin-login .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('atab-login').style.display=tab==='login'?'block':'none';
+  document.getElementById('atab-register').style.display=tab==='register'?'block':'none';
+  document.getElementById('admin-err').style.display='none';
+}
+
+// ═══════════════════════ STUDENT FLOW ═══════════════════════
+function validateCode(){
+  const name=document.getElementById('stu-name').value.trim();
+  const code=document.getElementById('stu-code').value.trim().toUpperCase();
+  const err=document.getElementById('land-err');err.style.display='none';
+  if(!name){err.textContent='Please enter your name.';err.style.display='block';return;}
+  if(!code){err.textContent='Please enter your access code.';err.style.display='block';return;}
+  const d=initDB();
+  if(!d.codes[code]){err.textContent='❌ Invalid code. Check with your teacher.';err.style.display='block';return;}
+  if(d.codes[code].used&&d.codes[code].usedBy!==name){err.textContent='❌ This code is already used. Ask your teacher for a new code.';err.style.display='block';return;}
+  d.codes[code].used=true;d.codes[code].usedBy=name;d.codes[code].usedAt=new Date().toISOString();
+  saveDB(d);S.student={name,code};
+  document.getElementById('exam-stu-name').textContent=name.split(' ')[0];
+  goTo('exam');
+}
+
+function selectExam(type,label){
+  S.exam=type;S.examLabel=label;
+  document.getElementById('cat-title').textContent=label+' — Category';
+  buildCats();goTo('category');
+}
+
+function buildCats(){
+  const cats=CATS[S.exam];
+  const grid=document.getElementById('cat-grid');grid.innerHTML='';
+  cats.forEach(cat=>{
+    const d=document.createElement('div');
+    d.className='cat-card';
+    d.innerHTML=`<div class="c-icon">${cat.icon}</div><div class="c-name">${cat.name}</div><div class="c-desc">${cat.desc}</div>`;
+    d.onclick=()=>selectCat(cat);
+    grid.appendChild(d);
+  });
+}
+
+function selectCat(cat){
+  S.category=cat;
+  document.getElementById('subj-title').textContent=S.examLabel+' — '+cat.name;
+  buildSubjects(cat.subjects);goTo('subject');
+}
+
+function buildSubjects(subs){
+  const list=document.getElementById('subject-list');list.innerHTML='';
+  subs.forEach(sub=>{
+    const d=document.createElement('div');
+    d.className='subj-item';
+    d.innerHTML=`<div class="subj-left"><span class="subj-emoji">${sub.e}</span><span class="subj-name">${sub.name}</span></div><span class="subj-arrow">›</span>`;
+    d.onclick=()=>selectSubject(sub);
+    list.appendChild(d);
+  });
+}
+
+function selectSubject(sub){
+  S.subject=sub;
+  document.getElementById('year-title').textContent=sub.name+' — Year';
+  buildYears();goTo('year');
+}
+
+function buildYears(){
+  const grid=document.getElementById('year-grid');grid.innerHTML='';
+  YEARS.forEach(y=>{
+    const d=document.createElement('div');
+    d.className='yr-btn';d.textContent=y;
+    d.onclick=()=>startQuiz(y);
+    grid.appendChild(d);
+  });
+}
+
+// ═══════════════════════ QUIZ ═══════════════════════
+async function startQuiz(year){
+  S.year=year;S.qi=0;S.score=0;S.answered=false;S.questions=[];
+  document.getElementById('quiz-label').textContent=`${S.subject.e} ${S.subject.name} ${year}`;
+  document.getElementById('quiz-body').innerHTML=`<div class="loading-q"><div class="spin"></div><div>Loading ${year} ${S.subject.name} questions…</div></div>`;
+  document.getElementById('explanation').className='explanation';
+  document.getElementById('next-btn').style.display='none';
+  goTo('quiz');startTimer();
+  try{
+    const url=`${ALOC_BASE}?subject=${S.subject.id}&type=${S.exam}&year=${year}`;
+    const res=await fetch(url,{headers:{'Accept':'application/json','Content-Type':'application/json','AccessToken':ALOC_TOKEN}});
+    const data=await res.json();
+    const raw=Array.isArray(data)?data:(data.data||[]);
+    if(!raw.length)throw new Error('empty');
+    S.questions=raw.map(q=>({
+      question:q.question,
+      options:[q.option_a,q.option_b,q.option_c,q.option_d].filter(Boolean),
+      answer:q.answer?q.answer.toLowerCase():'a',
+      solution:q.solution||''
+    }));
+    for(let i=S.questions.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[S.questions[i],S.questions[j]]=[S.questions[j],S.questions[i]];}
+    S.questions=S.questions.slice(0,20);
+    renderQ();
+  }catch(e){
+    document.getElementById('quiz-body').innerHTML=`<div class="loading-q"><div style="font-size:36px;margin-bottom:12px">⚠️</div><div style="color:#FF6B6B;font-size:14px;margin-bottom:8px">Could not load questions</div><div style="font-size:12px;color:var(--text3);margin-bottom:18px">Network issue or no questions for this year/subject. Try a different year.</div><button class="btn btn-outline btn-sm" onclick="goTo('year')" style="margin:0 auto;display:block">← Go Back</button></div>`;
+  }
+}
+
+function renderQ(){
+  const q=S.questions[S.qi],tot=S.questions.length;
+  document.getElementById('q-counter').textContent=`Q ${S.qi+1} of ${tot}`;
+  document.getElementById('q-score').textContent=`Score: ${S.score}`;
+  document.getElementById('prog-fill').style.width=`${(S.qi/tot)*100}%`;
+  document.getElementById('explanation').className='explanation';
+  document.getElementById('next-btn').style.display='none';
+  S.answered=false;
+  const letters=['A','B','C','D'];
+  const ansIdx=['a','b','c','d'].indexOf(q.answer);
+  document.getElementById('quiz-body').innerHTML=`
+    <div class="q-card">
+      <div class="q-num">Question ${S.qi+1}</div>
+      <div class="q-text">${q.question}</div>
+      <div class="opts" id="opts">
+        ${q.options.map((o,i)=>`<div class="opt" id="opt-${i}" onclick="pickAnswer(${i},${ansIdx})"><span class="opt-badge">${letters[i]}</span><span class="opt-text">${o}</span></div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function pickAnswer(chosen,correct){
+  if(S.answered)return;S.answered=true;
+  document.querySelectorAll('.opt').forEach(o=>o.classList.add('disabled'));
+  document.getElementById('opt-'+correct).classList.add('correct');
+  if(chosen===correct){S.score++;document.getElementById('opt-'+chosen).classList.add('correct');}
+  else{document.getElementById('opt-'+chosen).classList.add('wrong');}
+  document.getElementById('q-score').textContent=`Score: ${S.score}`;
+  const sol=S.questions[S.qi].solution;
+  const exp=document.getElementById('explanation');
+  exp.textContent=sol?'💡 '+sol:'✅ Correct answer: '+['A','B','C','D'][correct]+'.';
+  exp.classList.add('show');
+  const btn=document.getElementById('next-btn');btn.style.display='block';
+  btn.textContent=S.qi<S.questions.length-1?'Next Question →':'See My Result →';
+}
+
+function nextQ(){
+  if(S.qi<S.questions.length-1){S.qi++;renderQ();window.scrollTo(0,0);}
+  else showResult();
+}
+
+function confirmQuit(){if(confirm('Quit quiz? Progress will be lost.')){clearInterval(S.timerID);goTo('year');}}
+
+// ═══════════════════════ TIMER ═══════════════════════
+function startTimer(){
+  clearInterval(S.timerID);S.secs=0;
+  S.timerID=setInterval(()=>{
+    S.secs++;
+    const el=document.getElementById('quiz-timer');
+    if(el)el.textContent=`⏱ ${String(Math.floor(S.secs/60)).padStart(2,'0')}:${String(S.secs%60).padStart(2,'0')}`;
+  },1000);
+}
+
+// ═══════════════════════ RESULT ═══════════════════════
+function showResult(){
+  clearInterval(S.timerID);
+  const tot=S.questions.length,sc=S.score,pct=Math.round((sc/tot)*100);
+  document.getElementById('r-pct').textContent=pct+'%';
+  document.getElementById('r-correct').textContent=sc;
+  document.getElementById('r-wrong').textContent=tot-sc;
+  document.getElementById('r-total').textContent=tot;
+  let grade,msg;
+  if(pct>=80){grade='🏆 Excellent!';msg='Outstanding. You are exam ready!';}
+  else if(pct>=60){grade='✅ Good Job!';msg='Great work. Keep pushing to excellence.';}
+  else if(pct>=40){grade='📚 Keep Going';msg='Improving! Review your missed questions.';}
+  else{grade='💪 Don\'t Give Up';msg='Every practice session builds your strength.';}
+  document.getElementById('r-grade').textContent=grade;
+  document.getElementById('r-msg').textContent=msg;
+  document.getElementById('r-summary').textContent=`${S.student?.name} scored ${sc}/${tot} in ${S.examLabel} ${S.subject?.name} ${S.year}`;
+  const d=db();
+  d.scores.push({name:S.student?.name,code:S.student?.code,exam:S.examLabel,subject:S.subject?.name,year:S.year,score:sc,total:tot,pct,date:new Date().toISOString()});
+  saveDB(d);goTo('result');
+}
+
+function shareWhatsApp(){
+  const sc=S.score,tot=S.questions.length,pct=Math.round((sc/tot)*100);
+  const msg=`📚 *PrepZone Simulator*\n\n👤 ${S.student?.name}\n📝 ${S.examLabel} — ${S.subject?.name} (${S.year})\n✅ Score: ${sc}/${tot} (${pct}%)\n\n_Practise for WAEC, NECO & JAMB at PrepZone Simulator_`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg));
+}
+
+// ═══════════════════════ ADMIN ═══════════════════════
+function adminLogin(){
+  const email=document.getElementById('a-email').value.trim().toLowerCase();
+  const pass=document.getElementById('a-pass').value;
+  const err=document.getElementById('admin-err');err.style.display='none';
+  const d=initDB(),t=d.teachers[email];
+  if(!t||t.password!==pass){err.textContent='❌ Incorrect email or password.';err.style.display='block';return;}
+  S.adminUser=email;
+  document.getElementById('admin-name').textContent=t.name.split(' ')[0];
+  loadDash();goTo('admin');
+}
+function adminRegister(){
+  const name=document.getElementById('r-name').value.trim();
+  const email=document.getElementById('r-email').value.trim().toLowerCase();
+  const pass=document.getElementById('r-pass').value;
+  const err=document.getElementById('admin-err');err.style.display='none';
+  if(!name||!email||!pass){err.textContent='Please fill all fields.';err.style.display='block';return;}
+  if(pass.length<6){err.textContent='Password must be at least 6 characters.';err.style.display='block';return;}
+  const d=initDB();
+  if(d.teachers[email]){err.textContent='An account with this email already exists.';err.style.display='block';return;}
+  d.teachers[email]={name,password:pass,codes:[]};saveDB(d);
+  S.adminUser=email;
+  document.getElementById('admin-name').textContent=name.split(' ')[0];
+  loadDash();goTo('admin');
+}
+function adminLogout(){S.adminUser=null;goTo('landing');}
+
+function loadDash(){
+  const d=db(),t=d.teachers[S.adminUser];if(!t)return;
+  const myCodes=t.codes||[];
+  const used=myCodes.filter(c=>d.codes[c]?.used).length;
+  const students=new Set(myCodes.filter(c=>d.codes[c]?.usedBy).map(c=>d.codes[c].usedBy)).size;
+  document.getElementById('st-codes').textContent=myCodes.length;
+  document.getElementById('st-used').textContent=used;
+  document.getElementById('st-students').textContent=students;
+  renderCodes(d,t);renderScores(d,t);
+}
+
+function renderCodes(d,t){
+  const el=document.getElementById('codes-list');
+  if(!t.codes.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔑</div>No codes yet. Buy some above.</div>';return;}
+  el.innerHTML='';
+  [...t.codes].reverse().forEach(c=>{
+    const info=d.codes[c];
+    el.innerHTML+=`<div class="code-item"><div><div class="code-val">${c}</div><div class="code-meta">${info?.used?'Used by: '+info.usedBy:'Not used yet'}</div></div><span class="badge ${info?.used?'badge-used':'badge-active'}">${info?.used?'Used':'Active'}</span></div>`;
+  });
+}
+
+function renderScores(d,t){
+  const el=document.getElementById('scores-list');
+  const myCodes=new Set(t.codes||[]);
+  const scores=(d.scores||[]).filter(s=>myCodes.has(s.code)).reverse();
+  if(!scores.length){el.innerHTML='<div class="empty"><div class="empty-icon">📊</div>No student scores yet.</div>';return;}
+  el.innerHTML='';
+  scores.forEach(s=>{
+    const cls=s.pct>=70?'pct-hi':s.pct>=40?'pct-mid':'pct-lo';
+    el.innerHTML+=`<div class="score-item"><div><div class="sname">${s.name}</div><div class="smeta">${s.exam} · ${s.subject} · ${s.year} · ${new Date(s.date).toLocaleDateString('en-NG')}</div></div><span class="score-pct ${cls}">${s.pct}%</span></div>`;
+  });
+}
+
+function switchDashTab(tab,el){
+  document.querySelectorAll('#screen-admin .tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('dpanel-codes').style.display=tab==='codes'?'block':'none';
+  document.getElementById('dpanel-scores').style.display=tab==='scores'?'block':'none';
+}
+
+// ═══════════════════════ PAYSTACK ═══════════════════════
+function makeCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='PZ-';for(let i=0;i<5;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+
+function payAndGenerate(){
+  const qty=parseInt(document.getElementById('code-qty').value);
+  const amount=qty*500*100;
+  const d=initDB(),t=d.teachers[S.adminUser];
+  const handler=PaystackPop.setup({
+    key:PAYSTACK_PK,email:S.adminUser,amount,currency:'NGN',ref:'PZ_'+Date.now(),
+    callback(response){
+      const codes=[];
+      for(let i=0;i<qty;i++){const c=makeCode();d.codes[c]={owner:S.adminUser,used:false,usedBy:null};t.codes.push(c);codes.push(c);}
+      saveDB(d);loadDash();
+      alert(`✅ Payment confirmed!\n\n${qty} code(s) generated:\n\n${codes.join('\n')}\n\nShare these with your students.`);
+    },
+    onClose(){}
+  });
+  handler.openIframe();
+}
+
+initDB();
+</script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+</body>
+</html>
