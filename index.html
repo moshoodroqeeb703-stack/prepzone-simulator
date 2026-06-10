@@ -634,7 +634,7 @@ async function startQuiz(year){
   document.getElementById('next-btn').style.display='none';
   goTo('quiz');startTimer();
   try{
-    const url=`${ALOC_BASE}?subject=${S.subject.id}&type=${S.exam}&year=${year}`;
+    const url = `/api/questions?subject=${S.subject.id}&type=${S.exam}&year=${year}`;
     const res=await fetch(url,{headers:{'Accept':'application/json','Content-Type':'application/json','AccessToken':ALOC_TOKEN}});
     const data=await res.json();
     const raw=Array.isArray(data)?data:(data.data||[]);
