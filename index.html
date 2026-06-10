@@ -241,8 +241,7 @@ select option{background:var(--black3);}
       </div>
       <button class="btn btn-gold" onclick="validateCode()">Start Practising →</button>
       <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.7">
-        Demo code: <strong style="color:var(--gold);font-family:monospace;letter-spacing:2px">PZ-DEMO1</strong><br/>
-        Get a real code from your teacher
+        Get your access code from your teacher to start practising.
       </p>
     </div>
     <div id="ltab-teacher" style="display:none">
@@ -531,8 +530,7 @@ function initDB(){
   if(!d.teachers)d.teachers={};
   if(!d.codes)d.codes={};
   if(!d.scores)d.scores=[];
-  if(!d.teachers['demo@prepzone.ng'])d.teachers['demo@prepzone.ng']={name:'Demo Teacher',password:'demo123',codes:[]};
-  if(!d.codes['PZ-DEMO1']){d.codes['PZ-DEMO1']={owner:'demo@prepzone.ng',used:false,usedBy:null};d.teachers['demo@prepzone.ng'].codes.push('PZ-DEMO1');}
+
   saveDB(d);return d;
 }
 
@@ -634,7 +632,7 @@ async function startQuiz(year){
   document.getElementById('next-btn').style.display='none';
   goTo('quiz');startTimer();
   try{
-    const url = `/api/questions?subject=${S.subject.id}&type=${S.exam}&year=${year}`;
+    const url=`${ALOC_BASE}?subject=${S.subject.id}&type=${S.exam}&year=${year}`;
     const res=await fetch(url,{headers:{'Accept':'application/json','Content-Type':'application/json','AccessToken':ALOC_TOKEN}});
     const data=await res.json();
     const raw=Array.isArray(data)?data:(data.data||[]);
@@ -823,4 +821,4 @@ initDB();
 </script>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 </body>
-</html>
+          </html>
